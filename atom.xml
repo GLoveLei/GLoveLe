@@ -6,7 +6,7 @@
   <link href="https://glovelei.github.io/atom.xml" rel="self"/>
   
   <link href="https://glovelei.github.io/"/>
-  <updated>2023-06-21T13:02:28.825Z</updated>
+  <updated>2023-06-26T13:54:43.900Z</updated>
   <id>https://glovelei.github.io/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>文心一言百度人工智能AI大数据模型文心一言Python3.10接入</title>
+    <link href="https://glovelei.github.io/2023/04/10/Sai-01/"/>
+    <id>https://glovelei.github.io/2023/04/10/Sai-01/</id>
+    <published>2023-04-10T09:43:53.000Z</published>
+    <updated>2023-06-26T13:54:43.900Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/images/ai-01.png" alt="cover"></p><p>“文心”取自《文心雕龙》一书的开篇，作者刘勰在书中引述了一个古代典故：春秋时期，鲁国有一位名叫孔文子的大夫，他在学问上非常有造诣，但是他的儿子却不学无术，孔文子非常痛心。</p><p>一天，孔文子在山上遇到了一位神仙，神仙告诉他：“你的儿子之所以不学无术，是因为你没有给他灌输文心，让他懂得文学的魅力和意义。”孔文子听后深受启发，回家后开始给儿子灌输文学知识，儿子也逐渐对学问产生了兴趣，最终成为了一位有学问的人。因此，刘勰在书中将“文心”解释为“灌输文学知识的心灵”之意。</p><p>百度以“文心”命名自己的AI产品线，可见其对自己的中文处理能力是极为自信的，ERNIE3.0对标ChatGPT3.5/4.0，ERNIE-ViLG对标Stable-Diffusion，文心PLATO则可以理解为ChatGPT的embedding，可谓是野心勃勃。</p><h3 id="文心一言SDK引入"><a href="#文心一言SDK引入" class="headerlink" title="文心一言SDK引入"></a>文心一言SDK引入</h3><p>百度目前已经开源文心一言的sdk工具包：</p><pre><code class="bash">pip3 install --upgrade wenxin-api</code></pre><p>和百度云产品线一样，安装好以后，需要去文心一言官网获取appkey和appsecret</p><p><img src="/images/wenxin.png" alt="cover"></p><p> 随后编写请求逻辑：</p><pre><code class="python">import wenxin_api from wenxin_api.tasks.free_qa import FreeQAwenxin_api.ak = &quot;your ak&quot; #输入您的API Keywenxin_api.sk = &quot;your sk&quot; #输入您的Secret Keyinput_dict = &#123;    &quot;text&quot;: &quot;问题：你好！\n回答：&quot;,    &quot;seq_len&quot;: 512,    &quot;topp&quot;: 0.5,    &quot;penalty_score&quot;: 1.2,    &quot;min_dec_len&quot;: 2,    &quot;min_dec_penalty_text&quot;: &quot;。?：！[&lt;S&gt;]&quot;,    &quot;is_unidirectional&quot;: 0,    &quot;task_prompt&quot;: &quot;qa&quot;,    &quot;mask_type&quot;: &quot;paragraph&quot;&#125;requests = FreeQA.create(**input_dict)print(requests)</code></pre><pre><code class="text">&#123;  &quot;code&quot;: 0,  &quot;msg&quot;: &quot;success&quot;,  &quot;data&quot;: &#123;    &quot;result&quot;: &quot;你好！我是百度研发的知识增强大语言模型，能够与人对话互动，回答问题，协助创作，高效便捷地帮助你解决学习和工作中的问题。&quot;,    &quot;createTime&quot;: &quot;2023-03-16 16:02:10&quot;,    &quot;requestId&quot;: &quot;71a6efb46acbd64394374f44579a01eb&quot;,    &quot;text&quot;: &quot;天为什么这么蓝&quot;,    &quot;taskId&quot;: 1000000,    &quot;status&quot;: 1 # 0表示生成中，1表示生成成功  &#125;&#125;</code></pre><p>请求的参数含义请参照官方文档：</p><p><a href="https://wenxin.baidu.com/plato">https://wenxin.baidu.com/plato</a></p><p>这里需要注意的是，虽然参数支持async异步，但那不是指请求的异步方式返回，换句话说，文心模型返回还是需要等待的，并不是ChatGPT那种流式返回模式。</p><h3 id="文心一言API调用"><a href="#文心一言API调用" class="headerlink" title="文心一言API调用"></a>文心一言API调用</h3><p>文心一言SDK的功能有限，也不支持异步请求调用，如果需要定制化或者使用别的语言请求文心一言，需要提前发起Http请求获取token，这里我们使用异步请求库httpx:</p><pre><code class="bash">pip3 install httpx</code></pre><p>添加获取token逻辑：</p><pre><code class="python">class Winxin:    def chat(self,text):        input_dict = &#123;            &quot;text&quot;: f&quot;问题：&#123;text&#125;\n回答：&quot;,            &quot;seq_len&quot;: 512,            &quot;topp&quot;: 0.5,            &quot;penalty_score&quot;: 1.2,            &quot;min_dec_len&quot;: 2,            &quot;min_dec_penalty_text&quot;: &quot;。?：！[&lt;S&gt;]&quot;,            &quot;is_unidirectional&quot;: 0,            &quot;task_prompt&quot;: &quot;qa&quot;,            &quot;mask_type&quot;: &quot;paragraph&quot;        &#125;        rst = FreeQA.create(**input_dict)        print(rst)    async def get_token(self):        headers = &#123;&quot;Content-Type&quot;:&quot;application/x-www-form-urlencoded&quot;&#125;        async with httpx.AsyncClient() as client:            resp = await client.post(f&quot;https://wenxin.baidu.com/moduleApi/portal/api/oauth/token?grant_type=client_credentials&amp;client_id=&#123;wenxin_api.ak&#125;&amp;client_secret=&#123;wenxin_api.sk&#125;&quot;,headers=headers)            result = resp.json()            print(result)</code></pre><p> 异步调用文心一言接口的token:</p><pre><code class="python">if __name__ == &#39;__main__&#39;:    wx = Winxin()    asyncio.run(wx.get_token())</code></pre><p>程序返回：</p><pre><code class="text">&#123;&#39;code&#39;: 0, &#39;msg&#39;: &#39;success&#39;, &#39;data&#39;: &#39;24.3f6a63545345ae6588ea86a353.86400000.1679123673218.92a99f8955c6f9ab2c438a5f31b5d73b-173001&#39;&#125;</code></pre><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>产品力而言，ChatGPT珠玉在前，文心一言还有很长的路需要走。ChatGPT虽然是一座遥不可及的高峰，但是其他公司也无须放弃人工智能领域的研究，毕竟作为最老牌的中文搜索引擎，百度浸润几十年的中文处理能力，还是无人能出其右的。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/ai-01.png&quot; alt=&quot;cover&quot;&gt;&lt;/p&gt;
+&lt;p&gt;“文心”取自《文心雕龙》一书的开篇，作者刘勰在书中引述了一个古代典故：春秋时期，鲁国有一位名叫孔文子的大夫，他在学问上非常有造诣，但是他的儿子却不学无术，孔文子非常痛心。&lt;/p</summary>
+      
+    
+    
+    
+    <category term="chatgtp" scheme="https://glovelei.github.io/categories/chatgtp/"/>
+    
+    
+  </entry>
   
   <entry>
     <title>让ChatGPT直接编写可运行的程序代码(Python3.10实现)</title>
@@ -476,31 +499,6 @@
     
     
     <category term="Vue父子组件 子父组件" scheme="https://glovelei.github.io/tags/Vue%E7%88%B6%E5%AD%90%E7%BB%84%E4%BB%B6-%E5%AD%90%E7%88%B6%E7%BB%84%E4%BB%B6/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Vue路由钩子</title>
-    <link href="https://glovelei.github.io/2021/01/26/Sday02/"/>
-    <id>https://glovelei.github.io/2021/01/26/Sday02/</id>
-    <published>2021-01-26T06:59:21.000Z</published>
-    <updated>2023-03-06T08:45:39.298Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/river.png" alt="cover"></p><h2 id="路由钩子函数"><a href="#路由钩子函数" class="headerlink" title="路由钩子函数"></a>路由钩子函数</h2><h4 id="一、路由钩子函数"><a href="#一、路由钩子函数" class="headerlink" title="一、路由钩子函数"></a>一、路由钩子函数</h4><p>路由钩子作用就是拦截导航栏，就是在跳转的时候进行判断</p><pre><code>vue-router 提供的导航钩子主要用来拦截导航，让它完成跳转或取消</code></pre><h5 id="路由钩子分为三类：-全局的、单个路由独享的、或者组件级"><a href="#路由钩子分为三类：-全局的、单个路由独享的、或者组件级" class="headerlink" title="路由钩子分为三类： 全局的、单个路由独享的、或者组件级"></a>路由钩子分为三类： 全局的、单个路由独享的、或者组件级</h5><h4 id="二、全局钩子"><a href="#二、全局钩子" class="headerlink" title="二、全局钩子"></a>二、全局钩子</h4><p>主要包括beforeEach和aftrEach,这类钩子主要作用于全局,一般用来判断权限,以及以及页面丢失时候需要执行的操作。</p><pre><code class="js">1 beforeEach函数有三个参数：2 - to:router即将进入的路由对象3 - from:当前导航即将离开的路由4 - next:Function,进行管道中的一个钩子，如果执行完了，则导航的状态就是 confirmed （确认的）；否则为false，终止导航。5 可以使用router.beforeEach注册一个全局的 before 钩子6 router.beforeEach((to, from, next) =&gt; &#123; // ... &#125;)78 after 钩子没有 next 方法，不能改变导航9 router.afterEach(route =&gt; &#123; // ...&#125;)</code></pre><h4 id="三、单个路由钩子"><a href="#三、单个路由钩子" class="headerlink" title="三、单个路由钩子"></a>三、单个路由钩子</h4><p>主要用于写某个指定路由跳转时需要执行的逻辑</p><pre><code class="js">1 &#123;2        path: &#39;&#39;,3        component: &#39;&#39;,4        meta: &#39;&#39;,5        beforeEnter: (to, from, next) =&gt; &#123;     6            //进入时执行代码块7        &#125;,8        beforeLeave: (to, from, next) =&gt; &#123;9            //离开时执行代码块10        &#125;11    &#125;</code></pre><h4 id="四、组件内的钩子"><a href="#四、组件内的钩子" class="headerlink" title="四、组件内的钩子"></a>四、组件内的钩子</h4><p>主要包括 beforeRouteEnter和beforeRouteUpdate ,beforeRouteLeave,这几个钩子都是写在组件里面也可以传三个参数(to,from,next)。</p><pre><code class="js">1 &lt;script&gt;2  Vue.component(&#39;LifeCircle&#39;,&#123;3    template: &#39;#life-circle&#39;,4    data () &#123;5      return &#123;6      &#125;7    &#125;,8    // 初始化阶段钩子函数9    beforeCreate () &#123; //表示组件创建前的准备工作（ 初始化事件和生命周期 ）     10      //组件未创建，数据拿不到11      console.log(&#39;1&#39;);12    &#125;,13    created () &#123; // 组件创建结束14      console.log(&#39;2&#39;)15    &#125;,16    beforeMount () &#123; 17      console.log( &#39;3&#39; )18    &#125;,19    mounted () &#123;     //表示组件装载结束20      console.log(&#39;4&#39;)21    &#125;22 &lt;/script&gt;</code></pre>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/river.png&quot; alt=&quot;cover&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;路由钩子函数&quot;&gt;&lt;a href=&quot;#路由钩子函数&quot; class=&quot;headerlink&quot; title=&quot;路由钩子函数&quot;&gt;&lt;/a&gt;路由钩子函数&lt;/h2&gt;&lt;h4 id=&quot;</summary>
-      
-    
-    
-    
-    <category term="Vue" scheme="https://glovelei.github.io/categories/Vue/"/>
-    
-    
-    <category term="Vue路由钩子函数" scheme="https://glovelei.github.io/tags/Vue%E8%B7%AF%E7%94%B1%E9%92%A9%E5%AD%90%E5%87%BD%E6%95%B0/"/>
     
   </entry>
   

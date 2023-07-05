@@ -4,6 +4,25 @@
   
     
     <entry>
+      <title>文心一言百度人工智能AI大数据模型文心一言Python3.10接入</title>
+      <link href="2023/04/10/Sai-01/"/>
+      <url>2023/04/10/Sai-01/</url>
+      
+        <content type="html"><![CDATA[<p><img src="/images/ai-01.png" alt="cover"></p><p>“文心”取自《文心雕龙》一书的开篇，作者刘勰在书中引述了一个古代典故：春秋时期，鲁国有一位名叫孔文子的大夫，他在学问上非常有造诣，但是他的儿子却不学无术，孔文子非常痛心。</p><p>一天，孔文子在山上遇到了一位神仙，神仙告诉他：“你的儿子之所以不学无术，是因为你没有给他灌输文心，让他懂得文学的魅力和意义。”孔文子听后深受启发，回家后开始给儿子灌输文学知识，儿子也逐渐对学问产生了兴趣，最终成为了一位有学问的人。因此，刘勰在书中将“文心”解释为“灌输文学知识的心灵”之意。</p><p>百度以“文心”命名自己的AI产品线，可见其对自己的中文处理能力是极为自信的，ERNIE3.0对标ChatGPT3.5/4.0，ERNIE-ViLG对标Stable-Diffusion，文心PLATO则可以理解为ChatGPT的embedding，可谓是野心勃勃。</p><h3 id="文心一言SDK引入"><a href="#文心一言SDK引入" class="headerlink" title="文心一言SDK引入"></a>文心一言SDK引入</h3><p>百度目前已经开源文心一言的sdk工具包：</p><pre><code class="bash">pip3 install --upgrade wenxin-api</code></pre><p>和百度云产品线一样，安装好以后，需要去文心一言官网获取appkey和appsecret</p><p><img src="/images/wenxin.png" alt="cover"></p><p> 随后编写请求逻辑：</p><pre><code class="python">import wenxin_api from wenxin_api.tasks.free_qa import FreeQAwenxin_api.ak = &quot;your ak&quot; #输入您的API Keywenxin_api.sk = &quot;your sk&quot; #输入您的Secret Keyinput_dict = &#123;    &quot;text&quot;: &quot;问题：你好！\n回答：&quot;,    &quot;seq_len&quot;: 512,    &quot;topp&quot;: 0.5,    &quot;penalty_score&quot;: 1.2,    &quot;min_dec_len&quot;: 2,    &quot;min_dec_penalty_text&quot;: &quot;。?：！[&lt;S&gt;]&quot;,    &quot;is_unidirectional&quot;: 0,    &quot;task_prompt&quot;: &quot;qa&quot;,    &quot;mask_type&quot;: &quot;paragraph&quot;&#125;requests = FreeQA.create(**input_dict)print(requests)</code></pre><pre><code class="text">&#123;  &quot;code&quot;: 0,  &quot;msg&quot;: &quot;success&quot;,  &quot;data&quot;: &#123;    &quot;result&quot;: &quot;你好！我是百度研发的知识增强大语言模型，能够与人对话互动，回答问题，协助创作，高效便捷地帮助你解决学习和工作中的问题。&quot;,    &quot;createTime&quot;: &quot;2023-03-16 16:02:10&quot;,    &quot;requestId&quot;: &quot;71a6efb46acbd64394374f44579a01eb&quot;,    &quot;text&quot;: &quot;天为什么这么蓝&quot;,    &quot;taskId&quot;: 1000000,    &quot;status&quot;: 1 # 0表示生成中，1表示生成成功  &#125;&#125;</code></pre><p>请求的参数含义请参照官方文档：</p><p><a href="https://wenxin.baidu.com/plato">https://wenxin.baidu.com/plato</a></p><p>这里需要注意的是，虽然参数支持async异步，但那不是指请求的异步方式返回，换句话说，文心模型返回还是需要等待的，并不是ChatGPT那种流式返回模式。</p><h3 id="文心一言API调用"><a href="#文心一言API调用" class="headerlink" title="文心一言API调用"></a>文心一言API调用</h3><p>文心一言SDK的功能有限，也不支持异步请求调用，如果需要定制化或者使用别的语言请求文心一言，需要提前发起Http请求获取token，这里我们使用异步请求库httpx:</p><pre><code class="bash">pip3 install httpx</code></pre><p>添加获取token逻辑：</p><pre><code class="python">class Winxin:    def chat(self,text):        input_dict = &#123;            &quot;text&quot;: f&quot;问题：&#123;text&#125;\n回答：&quot;,            &quot;seq_len&quot;: 512,            &quot;topp&quot;: 0.5,            &quot;penalty_score&quot;: 1.2,            &quot;min_dec_len&quot;: 2,            &quot;min_dec_penalty_text&quot;: &quot;。?：！[&lt;S&gt;]&quot;,            &quot;is_unidirectional&quot;: 0,            &quot;task_prompt&quot;: &quot;qa&quot;,            &quot;mask_type&quot;: &quot;paragraph&quot;        &#125;        rst = FreeQA.create(**input_dict)        print(rst)    async def get_token(self):        headers = &#123;&quot;Content-Type&quot;:&quot;application/x-www-form-urlencoded&quot;&#125;        async with httpx.AsyncClient() as client:            resp = await client.post(f&quot;https://wenxin.baidu.com/moduleApi/portal/api/oauth/token?grant_type=client_credentials&amp;client_id=&#123;wenxin_api.ak&#125;&amp;client_secret=&#123;wenxin_api.sk&#125;&quot;,headers=headers)            result = resp.json()            print(result)</code></pre><p> 异步调用文心一言接口的token:</p><pre><code class="python">if __name__ == &#39;__main__&#39;:    wx = Winxin()    asyncio.run(wx.get_token())</code></pre><p>程序返回：</p><pre><code class="text">&#123;&#39;code&#39;: 0, &#39;msg&#39;: &#39;success&#39;, &#39;data&#39;: &#39;24.3f6a63545345ae6588ea86a353.86400000.1679123673218.92a99f8955c6f9ab2c438a5f31b5d73b-173001&#39;&#125;</code></pre><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>产品力而言，ChatGPT珠玉在前，文心一言还有很长的路需要走。ChatGPT虽然是一座遥不可及的高峰，但是其他公司也无须放弃人工智能领域的研究，毕竟作为最老牌的中文搜索引擎，百度浸润几十年的中文处理能力，还是无人能出其右的。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> chatgtp </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>让ChatGPT直接编写可运行的程序代码(Python3.10实现)</title>
       <link href="2023/03/16/SchatGPT-4/"/>
       <url>2023/03/16/SchatGPT-4/</url>
