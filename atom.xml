@@ -6,7 +6,7 @@
   <link href="https://glovelei.github.io/atom.xml" rel="self"/>
   
   <link href="https://glovelei.github.io/"/>
-  <updated>2023-06-26T13:54:43.900Z</updated>
+  <updated>2023-07-09T16:24:40.492Z</updated>
   <id>https://glovelei.github.io/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>OpenAI ChatGPT接入微信 wechatbot 搭建微信聊天机器人</title>
+    <link href="https://glovelei.github.io/2023/07/01/Swechat-chat/"/>
+    <id>https://glovelei.github.io/2023/07/01/Swechat-chat/</id>
+    <published>2023-07-01T11:03:30.000Z</published>
+    <updated>2023-07-09T16:24:40.492Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/images/wechat.png" alt="cover"></p><h1 id="OpenAI-ChatGPT接入微信-wechatbot-搭建微信聊天机器人"><a href="#OpenAI-ChatGPT接入微信-wechatbot-搭建微信聊天机器人" class="headerlink" title="OpenAI ChatGPT接入微信 wechatbot 搭建微信聊天机器人"></a>OpenAI ChatGPT接入微信 wechatbot 搭建微信聊天机器人</h1><h2 id="一、准备工作"><a href="#一、准备工作" class="headerlink" title="一、准备工作"></a>一、准备工作</h2><h3 id="首先是注册ChatGPT"><a href="#首先是注册ChatGPT" class="headerlink" title="首先是注册ChatGPT"></a>首先是注册ChatGPT</h3><ul><li><p>1、获取自己 ChatGPT 的 apikey <a href="https://platform.openai.com/account/api-keys">获取地址</a> 登入后即可获取</p></li><li><p>2、一台VPS境外服务器（本次演示系统 Debian 10 64）<a href="https://www.vultr.com/?ref=8941832-8H">Vultr 购买地址，点此进入</a>：按时计费，最低6$/月。</p></li><li><p>3、一个微信号（建议使用小号测试）</p></li><li><p>4、下载并安装FinalShell SSH工具</p></li></ul><p>Windows版下载地址:<a href="http://www.hostbuf.com/downloads/finalshell_install.exe">点此下载</a></p><p>macOS版下载地址: <a href="http://www.hostbuf.com/downloads/finalshell_install.pkg">点此下载</a></p><h2 id="二、ChatGPT接入微信"><a href="#二、ChatGPT接入微信" class="headerlink" title="二、ChatGPT接入微信"></a>二、ChatGPT接入微信</h2><h3 id="开始配置服务器"><a href="#开始配置服务器" class="headerlink" title="开始配置服务器"></a>开始配置服务器</h3><p>安装 Node 环境</p><pre><code>sudo apt update &amp;&amp; sudo apt upgradecurl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -sudo apt-get install nodejs</code></pre><p>安装<code>git</code>命令</p><pre><code>apt install git</code></pre><p>克隆 Wechat-Chatgpt 项目<a href="https://github.com/fuergaosi233/wechat-chatgpt">点此进入项目地址</a></p><pre><code>git clone https://github.com/fuergaosi233/wechat-chatgpt.git</code></pre><p>进入Wechat-Chatgpt项目</p><pre><code>cd wechat-chatgpt</code></pre><h3 id="安装依赖并创建配置文件"><a href="#安装依赖并创建配置文件" class="headerlink" title="安装依赖并创建配置文件"></a>安装依赖并创建配置文件</h3><p>切换到new-wechatgpt分支</p><pre><code>git checkout new-wechatgpt</code></pre><p>安装依赖</p><pre><code>npm install</code></pre><p>创建配置文件</p><pre><code>cp config.yaml.example config.yamlcp .env.example .env</code></pre><p>修改配置文件：API = 就是你在openAI官网上生成的apikey</p><pre><code>vi .env</code></pre><p>.env内容如下：</p><pre><code>CHAT_GPT_EMAIL=CHAT_GPT_PASSWORD=CHAT_GPT_RETRY_TIMES=CHAT_PRIVATE_TRIGGER_KEYWORD=OPENAI_PROXY=NOPECHA_KEY=CAPTCHA_TOKEN=OPENAI_API_KEY=填写你的API_KEY</code></pre><p>XShell保存退出指令：首先按ESC进入Command模式，然后输入“：wq”，回车就可以保存并退出了</p><p>修改模型</p><p>打开文件：</p><pre><code>cd wechat-chatgptvi node_modules/chatgpt/build/index.js</code></pre><p>找到73行，修改模型为：CHATGPT_MODEL=”text-davinci-003”</p><pre><code>text-davinci-003</code></pre><h3 id="保存好配置文件后，启动执行下方的启动命令，就可以和机器人聊天了！"><a href="#保存好配置文件后，启动执行下方的启动命令，就可以和机器人聊天了！" class="headerlink" title="保存好配置文件后，启动执行下方的启动命令，就可以和机器人聊天了！"></a>保存好配置文件后，启动执行下方的启动命令，就可以和机器人聊天了！</h3><pre><code>npm run dev</code></pre><h3 id="如果需要在后台守护进程运行，那么只需运行下面命令"><a href="#如果需要在后台守护进程运行，那么只需运行下面命令" class="headerlink" title="如果需要在后台守护进程运行，那么只需运行下面命令"></a>如果需要在后台守护进程运行，那么只需运行下面命令</h3><pre><code>nohup commandnohup chatgpt &amp;amp;&lt;/dev/null   &amp;amp; </code></pre><p>这样即使你断开VPS，机器人也会在后台运行。</p><p>运行测试结果：<br><img src="/images/wechat-02.png" alt="cover"></p><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>现在chatgpt已经越来越发达，任何一种接入方式都会让生活变的方便,如果普及以后都不用打开chatgtp官网链接vpn进行查询，方便高效实现高效ai工具<br>唯一美中不足的就是微信有防止接入机制容易封号,愿以后可以更加方便</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/wechat.png&quot; alt=&quot;cover&quot;&gt;&lt;/p&gt;
+&lt;h1 id=&quot;OpenAI-ChatGPT接入微信-wechatbot-搭建微信聊天机器人&quot;&gt;&lt;a href=&quot;#OpenAI-ChatGPT接入微信-wechatbot-搭建微</summary>
+      
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title>文心一言百度人工智能AI大数据模型文心一言Python3.10接入</title>
@@ -474,31 +495,6 @@
     
     
     <category term="微博三方登录" scheme="https://glovelei.github.io/tags/%E5%BE%AE%E5%8D%9A%E4%B8%89%E6%96%B9%E7%99%BB%E5%BD%95/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>子父组件</title>
-    <link href="https://glovelei.github.io/2021/01/27/Sday03/"/>
-    <id>https://glovelei.github.io/2021/01/27/Sday03/</id>
-    <published>2021-01-27T06:59:21.000Z</published>
-    <updated>2023-03-06T08:45:39.298Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/river.png" alt="cover"></p><h2 id="组件"><a href="#组件" class="headerlink" title="组件"></a>组件</h2><h4 id="什么是组件？"><a href="#什么是组件？" class="headerlink" title="什么是组件？"></a>什么是组件？</h4><p>   组件是Vue中的一个重要概念，是一个可以重复使用的Vue是可以复用的Vue实例，它拥有独一无二的组件名称，它可以扩展HTML元素，以组件名称的方式作为自定义的HTML标签。因为组件是可复用的Vue实例，所以它们与new Vue（）接收相同的选项，例如data，computed、watch、methods以及生命周期钩子等。仅有的例外是像el这样根实例特有的选项。</p><h2 id="父子组件通信"><a href="#父子组件通信" class="headerlink" title="父子组件通信"></a>父子组件通信</h2><h4 id="父组件"><a href="#父组件" class="headerlink" title="父组件"></a>父组件</h4><p> ·父组件在组件上定义了一个自定义事件childFn，事件名为parentFn用于接受子组件传过来的message值。</p><pre><code class="js">&lt;!-- 父组件 --&gt;&lt;template&gt;   &lt;div class=&quot;test&quot;&gt;     &lt;test-com @childFn=&quot;parentFn&quot;&gt;&lt;/test-com&gt;     &lt;br/&gt;      子组件传来的值 : &#123;&#123;message&#125;&#125;   &lt;/div&gt;&lt;/template&gt;&lt;script&gt;export default &#123;   // ...   data() &#123;       return &#123;            message: &#39;&#39;       &#125;   &#125;,   methods: &#123;      parentFn(payload) &#123;       this.message = payload;     &#125;   &#125;&#125;&lt;/script&gt;</code></pre><h4 id="子组件"><a href="#子组件" class="headerlink" title="子组件"></a>子组件</h4><p>·子组件是一个buttton按钮，并为其添加了一个click事件，当点击的时候使用$emit()触发事件，把message传给父组件。</p><pre><code class="js">&lt;!-- 子组件 --&gt;&lt;template&gt; &lt;div class=&quot;testCom&quot;&gt;    &lt;input type=&quot;text&quot; v-model=&quot;message&quot; /&gt;    &lt;button @click=&quot;click&quot;&gt;Send&lt;/button&gt;&lt;/div&gt;&lt;/template&gt;&lt;script&gt;export default &#123;    // ...    data() &#123;        return &#123;          // 默认          message: &#39;我是来自子组件的消息&#39;        &#125;    &#125;,    methods: &#123;      click() &#123;            this.$emit(&#39;childFn&#39;, this.message);        &#125;    &#125;    &#125;&lt;/script&gt;</code></pre><h4 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h4><p>·通过”props down , events up”我们就简单的实现了父子组件之间的双向传值</p><h2 id="子父组件通信"><a href="#子父组件通信" class="headerlink" title="子父组件通信"></a>子父组件通信</h2><p>第一种方法是直接在子组件中通过this.$parent.event来调用父组件的方法</p><h4 id="父组件-1"><a href="#父组件-1" class="headerlink" title="父组件"></a>父组件</h4><pre><code class="js">&lt;template&gt;  &lt;div&gt;    &lt;check&gt;&lt;/check&gt;  &lt;/div&gt;&lt;/template&gt;&lt;script&gt;  import check from &#39;@/components/check&#39;;  export default &#123;    components: &#123;      check    &#125;,    methods: &#123;      father() &#123;        console.log(&#39;传值成功&#39;);      &#125;    &#125;  &#125;;&lt;/script&gt;</code></pre><h4 id="子组件-1"><a href="#子组件-1" class="headerlink" title="子组件"></a>子组件</h4><pre><code class="js">&lt;template&gt;  &lt;div&gt;    &lt;button @click=&quot;check()&quot;&gt;点击&lt;/button&gt;  &lt;/div&gt;&lt;/template&gt;&lt;script&gt;  export default &#123;    methods: &#123;      check() &#123;        this.$parent.father();      &#125;    &#125;  &#125;;&lt;/script&gt;</code></pre><p>·第二种方法是在子组件里用$emit向父组件触发一个事件，父组件监听这个事件就行了。</p><h4 id="父组件-2"><a href="#父组件-2" class="headerlink" title="父组件"></a>父组件</h4><pre><code class="js">&lt;template&gt;  &lt;div&gt;    &lt;check @fatherMethod=&quot;father&quot;&gt;&lt;/check&gt;  &lt;/div&gt;&lt;/template&gt;&lt;script&gt;  import check from &#39;@/components/check&#39;;  export default &#123;    components: &#123;      check    &#125;,    methods: &#123;      father() &#123;        console.log(&#39;传值成功&#39;);      &#125;    &#125;  &#125;;&lt;/script&gt;</code></pre><h4 id="子组件-2"><a href="#子组件-2" class="headerlink" title="子组件"></a>子组件</h4><pre><code class="js">&lt;template&gt;  &lt;div&gt;    &lt;button @click=&quot;check()&quot;&gt;点击&lt;/button&gt;  &lt;/div&gt;&lt;/template&gt;&lt;script&gt;  export default &#123;    methods: &#123;      check() &#123;        this.$emit(&#39;father&#39;);      &#125;    &#125;  &#125;;&lt;/script&gt;</code></pre><p>·第三种是父组件把方法传入子组件中，在子组件里直接调用这个方法</p><h4 id="父组件-3"><a href="#父组件-3" class="headerlink" title="父组件"></a>父组件</h4><pre><code class="js">&lt;template&gt;  &lt;div&gt;    &lt;check :father=&quot;father&quot;&gt;&lt;/check&gt;  &lt;/div&gt;&lt;/template&gt;&lt;script&gt;  import check from &#39;@/components/check&#39;;  export default &#123;    components: &#123;      check    &#125;,    methods: &#123;      father() &#123;        console.log(&#39;传值成功&#39;);      &#125;    &#125;  &#125;;&lt;/script&gt;</code></pre><h4 id="子组件-3"><a href="#子组件-3" class="headerlink" title="子组件"></a>子组件</h4><pre><code class="js">&lt;template&gt;  &lt;div&gt;    &lt;button @click=&quot;check()&quot;&gt;点击&lt;/button&gt;  &lt;/div&gt;&lt;/template&gt;&lt;script&gt;  export default &#123;    props: &#123;      father: &#123;        type: Function,        default: null      &#125;    &#125;,    methods: &#123;      check() &#123;        if (this.father) &#123;          this.father();        &#125;      &#125;    &#125;  &#125;;&lt;/script&gt;</code></pre>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/river.png&quot; alt=&quot;cover&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;组件&quot;&gt;&lt;a href=&quot;#组件&quot; class=&quot;headerlink&quot; title=&quot;组件&quot;&gt;&lt;/a&gt;组件&lt;/h2&gt;&lt;h4 id=&quot;什么是组件？&quot;&gt;&lt;a href=</summary>
-      
-    
-    
-    
-    <category term="Vue" scheme="https://glovelei.github.io/categories/Vue/"/>
-    
-    
-    <category term="Vue父子组件 子父组件" scheme="https://glovelei.github.io/tags/Vue%E7%88%B6%E5%AD%90%E7%BB%84%E4%BB%B6-%E5%AD%90%E7%88%B6%E7%BB%84%E4%BB%B6/"/>
     
   </entry>
   

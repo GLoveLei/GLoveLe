@@ -4,6 +4,19 @@
   
     
     <entry>
+      <title>OpenAI ChatGPT接入微信 wechatbot 搭建微信聊天机器人</title>
+      <link href="2023/07/01/Swechat-chat/"/>
+      <url>2023/07/01/Swechat-chat/</url>
+      
+        <content type="html"><![CDATA[<p><img src="/images/wechat.png" alt="cover"></p><h1 id="OpenAI-ChatGPT接入微信-wechatbot-搭建微信聊天机器人"><a href="#OpenAI-ChatGPT接入微信-wechatbot-搭建微信聊天机器人" class="headerlink" title="OpenAI ChatGPT接入微信 wechatbot 搭建微信聊天机器人"></a>OpenAI ChatGPT接入微信 wechatbot 搭建微信聊天机器人</h1><h2 id="一、准备工作"><a href="#一、准备工作" class="headerlink" title="一、准备工作"></a>一、准备工作</h2><h3 id="首先是注册ChatGPT"><a href="#首先是注册ChatGPT" class="headerlink" title="首先是注册ChatGPT"></a>首先是注册ChatGPT</h3><ul><li><p>1、获取自己 ChatGPT 的 apikey <a href="https://platform.openai.com/account/api-keys">获取地址</a> 登入后即可获取</p></li><li><p>2、一台VPS境外服务器（本次演示系统 Debian 10 64）<a href="https://www.vultr.com/?ref=8941832-8H">Vultr 购买地址，点此进入</a>：按时计费，最低6$/月。</p></li><li><p>3、一个微信号（建议使用小号测试）</p></li><li><p>4、下载并安装FinalShell SSH工具</p></li></ul><p>Windows版下载地址:<a href="http://www.hostbuf.com/downloads/finalshell_install.exe">点此下载</a></p><p>macOS版下载地址: <a href="http://www.hostbuf.com/downloads/finalshell_install.pkg">点此下载</a></p><h2 id="二、ChatGPT接入微信"><a href="#二、ChatGPT接入微信" class="headerlink" title="二、ChatGPT接入微信"></a>二、ChatGPT接入微信</h2><h3 id="开始配置服务器"><a href="#开始配置服务器" class="headerlink" title="开始配置服务器"></a>开始配置服务器</h3><p>安装 Node 环境</p><pre><code>sudo apt update &amp;&amp; sudo apt upgradecurl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -sudo apt-get install nodejs</code></pre><p>安装<code>git</code>命令</p><pre><code>apt install git</code></pre><p>克隆 Wechat-Chatgpt 项目<a href="https://github.com/fuergaosi233/wechat-chatgpt">点此进入项目地址</a></p><pre><code>git clone https://github.com/fuergaosi233/wechat-chatgpt.git</code></pre><p>进入Wechat-Chatgpt项目</p><pre><code>cd wechat-chatgpt</code></pre><h3 id="安装依赖并创建配置文件"><a href="#安装依赖并创建配置文件" class="headerlink" title="安装依赖并创建配置文件"></a>安装依赖并创建配置文件</h3><p>切换到new-wechatgpt分支</p><pre><code>git checkout new-wechatgpt</code></pre><p>安装依赖</p><pre><code>npm install</code></pre><p>创建配置文件</p><pre><code>cp config.yaml.example config.yamlcp .env.example .env</code></pre><p>修改配置文件：API = 就是你在openAI官网上生成的apikey</p><pre><code>vi .env</code></pre><p>.env内容如下：</p><pre><code>CHAT_GPT_EMAIL=CHAT_GPT_PASSWORD=CHAT_GPT_RETRY_TIMES=CHAT_PRIVATE_TRIGGER_KEYWORD=OPENAI_PROXY=NOPECHA_KEY=CAPTCHA_TOKEN=OPENAI_API_KEY=填写你的API_KEY</code></pre><p>XShell保存退出指令：首先按ESC进入Command模式，然后输入“：wq”，回车就可以保存并退出了</p><p>修改模型</p><p>打开文件：</p><pre><code>cd wechat-chatgptvi node_modules/chatgpt/build/index.js</code></pre><p>找到73行，修改模型为：CHATGPT_MODEL=”text-davinci-003”</p><pre><code>text-davinci-003</code></pre><h3 id="保存好配置文件后，启动执行下方的启动命令，就可以和机器人聊天了！"><a href="#保存好配置文件后，启动执行下方的启动命令，就可以和机器人聊天了！" class="headerlink" title="保存好配置文件后，启动执行下方的启动命令，就可以和机器人聊天了！"></a>保存好配置文件后，启动执行下方的启动命令，就可以和机器人聊天了！</h3><pre><code>npm run dev</code></pre><h3 id="如果需要在后台守护进程运行，那么只需运行下面命令"><a href="#如果需要在后台守护进程运行，那么只需运行下面命令" class="headerlink" title="如果需要在后台守护进程运行，那么只需运行下面命令"></a>如果需要在后台守护进程运行，那么只需运行下面命令</h3><pre><code>nohup commandnohup chatgpt &amp;amp;&lt;/dev/null   &amp;amp; </code></pre><p>这样即使你断开VPS，机器人也会在后台运行。</p><p>运行测试结果：<br><img src="/images/wechat-02.png" alt="cover"></p><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>现在chatgpt已经越来越发达，任何一种接入方式都会让生活变的方便,如果普及以后都不用打开chatgtp官网链接vpn进行查询，方便高效实现高效ai工具<br>唯一美中不足的就是微信有防止接入机制容易封号,愿以后可以更加方便</p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>文心一言百度人工智能AI大数据模型文心一言Python3.10接入</title>
       <link href="2023/04/10/Sai-01/"/>
       <url>2023/04/10/Sai-01/</url>
@@ -601,19 +614,6 @@
           <category> python </category>
           
       </categories>
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>一个sql查询排序小技巧</title>
-      <link href="2019/07/01/Swechat-chat/"/>
-      <url>2019/07/01/Swechat-chat/</url>
-      
-        <content type="html"><![CDATA[<h1 id="OpenAI-ChatGPT接入微信-wechatbot-搭建微信聊天机器人"><a href="#OpenAI-ChatGPT接入微信-wechatbot-搭建微信聊天机器人" class="headerlink" title="OpenAI ChatGPT接入微信 wechatbot 搭建微信聊天机器人"></a>OpenAI ChatGPT接入微信 wechatbot 搭建微信聊天机器人</h1><h2 id="一、准备工作"><a href="#一、准备工作" class="headerlink" title="一、准备工作"></a>一、准备工作</h2><h3 id="首先是注册ChatGPT，-点此进入注册ChatGPT的视频教程"><a href="#首先是注册ChatGPT，-点此进入注册ChatGPT的视频教程" class="headerlink" title="首先是注册ChatGPT， 点此进入注册ChatGPT的视频教程"></a>首先是注册ChatGPT， <a href="https://youtu.be/SA5HJxtfHZE">点此进入注册ChatGPT的视频教程</a></h3><ul><li><p>1、获取自己 ChatGPT 的 apikey <a href="https://platform.openai.com/account/api-keys">获取地址</a> 登入后即可获取</p></li><li><p>2、一台VPS境外服务器（本次演示系统 Debian 10 64）</p></li></ul><p><a href="https://www.vultr.com/?ref=8941832-8H">Vultr 购买地址，点此进入</a>：按时计费，最低6$/月。</p><ul><li><p>3、一个微信号（建议使用小号测试）</p></li><li><p>4、下载并安装FinalShell SSH工具</p></li></ul><p>Windows版下载地址:<a href="http://www.hostbuf.com/downloads/finalshell_install.exe">点此下载</a></p><p>macOS版下载地址: <a href="http://www.hostbuf.com/downloads/finalshell_install.pkg">点此下载</a></p><h2 id="二、ChatGPT接入微信"><a href="#二、ChatGPT接入微信" class="headerlink" title="二、ChatGPT接入微信"></a>二、ChatGPT接入微信</h2><h3 id="开始配置服务器"><a href="#开始配置服务器" class="headerlink" title="开始配置服务器"></a>开始配置服务器</h3><p>安装 Node 环境</p><pre><code>sudo apt update &amp;&amp; sudo apt upgradecurl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -sudo apt-get install nodejs</code></pre><p>安装<code>git</code>命令</p><pre><code>apt install git</code></pre><p>克隆 Wechat-Chatgpt 项目<a href="https://github.com/fuergaosi233/wechat-chatgpt">点此进入项目地址</a></p><pre><code>git clone https://github.com/fuergaosi233/wechat-chatgpt.git</code></pre><p>进入Wechat-Chatgpt项目</p><pre><code>cd wechat-chatgpt</code></pre><h3 id="安装依赖并创建配置文件"><a href="#安装依赖并创建配置文件" class="headerlink" title="安装依赖并创建配置文件"></a>安装依赖并创建配置文件</h3><p>切换到new-wechatgpt分支</p><pre><code>git checkout new-wechatgpt</code></pre><p>安装依赖</p><pre><code>npm install</code></pre><p>创建配置文件</p><pre><code>cp config.yaml.example config.yamlcp .env.example .env</code></pre><p>修改配置文件：API = 就是你在openAI官网上生成的apikey</p><pre><code>vi .env</code></pre><p>.env内容如下：</p><pre><code>CHAT_GPT_EMAIL=CHAT_GPT_PASSWORD=CHAT_GPT_RETRY_TIMES=CHAT_PRIVATE_TRIGGER_KEYWORD=OPENAI_PROXY=NOPECHA_KEY=CAPTCHA_TOKEN=OPENAI_API_KEY=填写你的API_KEY</code></pre><p>XShell保存退出指令：首先按ESC进入Command模式，然后输入“：wq”，回车就可以保存并退出了</p><p>修改模型</p><p>打开文件：</p><pre><code>cd wechat-chatgptvi node_modules/chatgpt/build/index.js</code></pre><p>找到73行，修改模型为：CHATGPT_MODEL=”text-davinci-003”</p><pre><code>text-davinci-003</code></pre><h3 id="保存好配置文件后，启动执行下方的启动命令，就可以和机器人聊天了！"><a href="#保存好配置文件后，启动执行下方的启动命令，就可以和机器人聊天了！" class="headerlink" title="保存好配置文件后，启动执行下方的启动命令，就可以和机器人聊天了！"></a>保存好配置文件后，启动执行下方的启动命令，就可以和机器人聊天了！</h3><pre><code>npm run dev</code></pre><h3 id="如果需要在后台守护进程运行，那么只需运行下面命令"><a href="#如果需要在后台守护进程运行，那么只需运行下面命令" class="headerlink" title="如果需要在后台守护进程运行，那么只需运行下面命令"></a>如果需要在后台守护进程运行，那么只需运行下面命令</h3><pre><code>nohup commandnohup chatgpt &amp;amp;&lt;/dev/null   &amp;amp; </code></pre><p>这样即使你断开VPS，机器人也会在后台运行。</p><p>具体的设置教程：</p>]]></content>
-      
       
       
     </entry>
